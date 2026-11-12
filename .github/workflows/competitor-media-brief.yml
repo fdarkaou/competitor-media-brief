@@ -1,0 +1,43 @@
+# Example: every Monday, read your rivals' stored media view and post what changed to Slack or Discord.
+# Disabled until you set the repository variable ENABLE_COMPETITOR_MEDIA_BRIEF=true.
+# Secrets: PEEKPANDA_TOKEN (PeekPanda API key, required), COMPETITOR_MEDIA_WEBHOOK_URL (optional).
+# One call per app per run with --pages 1 (Peek allows 30 API and MCP calls a UTC day, Panda 1,000).
+name: competitor-media-brief
+on:
+  schedule:
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+jobs:
+  brief:
+    if: vars.ENABLE_COMPETITOR_MEDIA_BRIEF == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/cache/restore@v4
+        with:
+          path: media-state.json
+          key: competitor-media-state-${{ github.run_id }}
+          restore-keys: competitor-media-state-
+      - name: competitor media brief
+        env:
+          PEEKPANDA_TOKEN: ${{ secrets.PEEKPANDA_TOKEN }}
+          COMPETITOR_MEDIA_WEBHOOK_URL: ${{ secrets.COMPETITOR_MEDIA_WEBHOOK_URL }}
+        run: |
+          # Edit the App Store ids below (your rivals; optional =Label).
+          ARGS="--app 1000000001=Rival,1000000002 --state media-state.json --archive history"
+          if [ -n "$COMPETITOR_MEDIA_WEBHOOK_URL" ]; then ARGS="$ARGS --webhook $COMPETITOR_MEDIA_WEBHOOK_URL"; fi
+          node cli.js $ARGS >> "$GITHUB_STEP_SUMMARY"
+          node cli.js --file media-state.json --format csv > competitor-media.csv
+      - uses: actions/cache/save@v4
+        with:
+          path: media-state.json
+          key: competitor-media-state-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: competitor-media-brief
+          path: |
+            competitor-media.csv
+            history/

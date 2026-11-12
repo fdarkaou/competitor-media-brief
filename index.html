@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Competitor media brief: where rival iOS apps send their ad clicks</title>
+<meta name="description" content="Paste PeekPanda media responses and see where rival iOS apps send their Meta and TikTok ad clicks (App Store, Play Store or web funnel), their landing pages, live ads and organic-post matches. Runs in your browser.">
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; color: #1b1b1f; }
+  textarea { width: 100%; min-height: 150px; font: 13px ui-monospace, monospace; }
+  button { padding: .45rem .9rem; margin: .5rem .5rem .5rem 0; cursor: pointer; }
+  table { border-collapse: collapse; width: 100%; margin-top: .5rem; font-size: 13px; }
+  th, td { border-bottom: 1px solid #ddd; padding: .35rem .5rem; text-align: left; vertical-align: top; }
+  td.n, th.n { text-align: right; white-space: nowrap; }
+  .muted { color: #777; } .err { color: #cf222e; white-space: pre-wrap; }
+  .kpi { display: flex; flex-wrap: wrap; gap: .75rem; margin: .75rem 0; }
+  .kpi div { background: #f6f8fa; border-radius: 6px; padding: .4rem .8rem; min-width: 110px; } .kpi b { display: block; font-size: 20px; }
+  .split { display: flex; height: 16px; width: 260px; border-radius: 3px; overflow: hidden; background: #eee; }
+  .split span { display: block; height: 100%; }
+  .appStore { background: #2563eb; } .playStore { background: #16a34a; } .web { background: #f59e0b; } .unknown { background: #9ca3af; }
+  .key span { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 .25rem 0 .75rem; }
+  .chip { display: inline-block; font-size: 11px; padding: .05rem .4rem; border-radius: 999px; background: #eef2ff; color: #3730a3; margin: 0 .2rem .2rem 0; }
+  .chip.web { background: #fef3c7; color: #92400e; }
+  pre { background: #f6f8fa; padding: .75rem; overflow-x: auto; font-size: 13px; }
+  footer { margin-top: 2.5rem; font-size: 13px; color: #555; }
+  a { color: #0969da; }
+</style>
+</head>
+<body>
+<h1>Competitor media brief</h1>
+<p>Do your rivals send their Meta and TikTok ad clicks to the App Store, or to a web page first? Paste one or more PeekPanda media responses and this page shows each app's destination split, its landing pages, its live ads and the public organic posts that mention it. Nothing leaves your browser; this page never calls the API.</p>
+<textarea id="in" spellcheck="false" placeholder='{"organic":{"data":[...]},"paidAds":{"items":[...],"nextCursor":null,"hasMore":false},"paidAdDestinations":{"appStore":14,"playStore":2,"web":6,"unknown":1,"landingPages":[...]}}'></textarea>
+<p class="muted">Optional: paste a report you saved earlier (CLI <code>--format json</code> or a <code>--state</code> file) to see what changed since then.</p>
+<textarea id="prev" spellcheck="false" style="min-height:60px"></textarea>
+<div>
+  <button id="go">Show</button>
+  <button id="ex">Load example data</button>
+  <button id="csv" disabled>Download CSV</button>
+</div>
+<div id="err" class="err"></div>
+<div id="out"></div>
+
+<h2>Where to get the JSON</h2>
+<p>The input comes from <a href="https://peekpanda.com">PeekPanda</a>, an iOS competitor catalogue where every app has a case file of dated, stored evidence. Read one app's media view with an API key (one call from your plan's daily API and MCP allowance):</p>
+<pre>curl --get 'https://api.peekpanda.com/v1/competitors/ios/1000000001/media' \
+  --header "Authorization: Bearer $PEEKPANDA_TOKEN" \
+  --header 'x-genviral-tenancy: personal'</pre>
+<p>Paste a single response, or a JSON array of them. Over MCP the same read is <code>get_app</code> with action <code>media</code>. The <a href="https://peekpanda.com/docs/get-competitor-media">get competitor media reference</a> lists the fields. The command-line version on GitHub reads several apps for you, follows the live ads list across pages, keeps a weekly diff and can post to Slack or Discord.</p>
+<p class="muted">Destination counts are where the app's stored ads sent their clicks; only App Store ads count as App Store. The live ads list is newest discovered first and about a minute behind new ads. Organic matches are suggestions, not verified ownership. Zero stored ads is not proof of none anywhere. There is no spend or reach here. Image and video links are short-lived, so this page does not show them.</p>
+<footer>MIT licensed sample. <a href="https://github.com/fdarkaou/competitor-media-brief">Source on GitHub</a>. Example data is made up and is not real apps.</footer>
+
+<script type="module">
+import { toReport, diff, diffLines, toCsv, fmt, DEST_KEYS, DEST_LABEL } from './media.js';
+const $ = (id) => document.getElementById(id);
+const h = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const safe = (u) => (/^https:\/\//.test(u ?? '') ? h(u) : null);
+let report = null;
+
+function split(a) {
+  if (!a.destinations || !a.destinationsTotal) return '<span class="muted">no stored ads</span>';
+  return `<div class="split" title="${DEST_KEYS.map((k) => `${DEST_LABEL[k]} ${a.destinations[k] ?? 0}`).join(', ')}">${DEST_KEYS.map((k) => `<span class="${k}" style="width:${((a.destinations[k] ?? 0) / a.destinationsTotal) * 100}%"></span>`).join('')}</div>`;
+}
+
+function render() {
+  $('err').textContent = ''; $('out').innerHTML = ''; $('csv').disabled = true;
+  try {
+    const input = JSON.parse($('in').value);
+    const dated = [].concat(input).some((e) => e?.fetchedAt);
+    report = toReport(input, { fetchedAt: dated ? null : new Date().toISOString() });
+    const prevText = $('prev').value.trim();
+    const d = prevText ? diff(report, JSON.parse(prevText)) : null;
+    const t = report.totals;
+    let html = `<div class="kpi"><div><b>${t.apps}</b>apps</div><div><b>${t.liveAdsRead}</b>live ads read</div><div><b>${t.appsWithWebFunnel}</b>apps with web-bound ads</div><div><b>${t.organicMatches}</b>organic matches</div></div>`;
+    if (d) { const lines = diffLines(d); html += `<h2>Since the last report</h2><ul>${(lines.length ? lines : ['No changes.']).map((l) => `<li>${h(l)}</li>`).join('')}</ul>`; }
+    html += `<h2>Where the ad clicks go</h2><p class="key muted">${DEST_KEYS.map((k) => `<span class="${k}"></span>${DEST_LABEL[k]}`).join('')}</p>`;
+    html += '<table><tr><th>App</th><th>Destination split</th><th class="n">App Store</th><th class="n">Play</th><th class="n">Web</th><th class="n">Unknown</th><th class="n">Web share</th><th class="n">Live ads read</th><th class="n">Organic</th></tr>';
+    for (const a of report.apps) html += `<tr><td>${h(a.label ?? a.storeId)}<div class="muted">${h(a.storeId)}</div></td><td>${split(a)}</td>${DEST_KEYS.map((k) => `<td class="n">${a.destinations ? fmt(a.destinations[k]) : '—'}</td>`).join('')}<td class="n">${a.webShare == null ? '—' : a.webShare + '%'}</td><td class="n">${a.liveAdsRead}${a.liveAdsComplete ? '' : '+'}</td><td class="n">${a.organic.length}</td></tr>`;
+    html += '</table>';
+    for (const a of report.apps) {
+      html += `<h2>${h(a.label ?? a.storeId)} <span class="muted">${h(a.storeId)}</span></h2>`;
+      if (a.landingPages.length) html += `<p>Landing pages: ${a.landingPages.map((p) => `<span class="chip${p.kind === 'web' ? ' web' : ''}">${h(p.page ?? p.url)}${p.adCount != null ? ` · ${fmt(p.adCount)} ads` : ''}</span>`).join('')}</p>`;
+      if (a.ads.length) {
+        html += `<table><tr><th>Discovered</th><th>Platform</th><th>Format</th><th class="n">Days live</th><th>Destination</th><th>CTA</th><th>Hook</th><th></th></tr>`;
+        for (const x of a.ads) html += `<tr><td>${h((x.discoveredAt ?? '').slice(0, 10))}</td><td>${h(x.platform)}</td><td>${h(x.format)}</td><td class="n">${fmt(x.daysLive)}</td><td><span class="chip${x.destinationKind === 'web' ? ' web' : ''}">${h(x.destinationHost ?? x.destinationKind ?? '—')}</span></td><td>${h(x.cta ?? '—')}</td><td>${h(x.hook ?? '—')}</td><td>${safe(x.sourceUrl) ? `<a href="${safe(x.sourceUrl)}" rel="noopener nofollow" target="_blank">ad library</a>` : ''}</td></tr>`;
+        html += '</table>';
+        if (!a.liveAdsComplete) html += '<p class="muted">More live ads on later pages (hasMore true). The CLI can follow them with --pages.</p>';
+      } else html += `<p class="muted">${a.destinationsTotal ? 'No live ads in the stored list right now.' : 'No stored paid ads (not collected, or none found; not proof of none anywhere).'}</p>`;
+      if (a.organic.length) {
+        html += `<p>Organic matches${a.organicCandidateLimitReached ? ' (candidate limit reached)' : ''}:</p><ul>`;
+        for (const o of a.organic) html += `<li>${safe(o.link) ? `<a href="${safe(o.link)}" rel="noopener nofollow" target="_blank">${h(o.link)}</a>` : h(o.sourceId)} <span class="muted">${h([o.matchStatus, o.evidence, o.score != null ? `score ${o.score}` : null].filter(Boolean).join(', '))}</span>${o.caption ? `<div>${h(o.caption)}</div>` : ''}</li>`;
+        html += '</ul>';
+      }
+    }
+    $('out').innerHTML = html;
+    $('csv').disabled = false;
+  } catch (e) { $('err').textContent = e.message; }
+}
+$('go').onclick = render;
+$('ex').onclick = async () => {
+  $('in').value = await (await fetch('examples/media.json')).text();
+  $('prev').value = await (await fetch('examples/previous.json')).text();
+  render();
+};
+$('csv').onclick = () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([toCsv(report)], { type: 'text/csv' }));
+  a.download = 'competitor-media-brief.csv'; a.click();
+};
+</script>
+</body>
+</html>

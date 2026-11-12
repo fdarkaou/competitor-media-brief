@@ -1,0 +1,238 @@
+[
+  {
+    "storeId": "1000000001",
+    "label": "Example Calories",
+    "fetchedAt": "2026-11-12T08:00:00.000Z",
+    "media": {
+      "organic": {
+        "data": [
+          {
+            "sourceId": "organic-ex-1",
+            "productName": "Example Calories",
+            "caption": "I tracked every meal for 30 days with Example Calories",
+            "link": "https://www.tiktok.com/@example/video/1",
+            "match": {
+              "status": "suggested",
+              "evidence": "product_name",
+              "score": 0.91
+            }
+          },
+          {
+            "sourceId": "organic-ex-3",
+            "productName": "Example Calories",
+            "caption": "Macro check in under a minute",
+            "link": "https://www.tiktok.com/@example/video/3",
+            "match": {
+              "status": "suggested",
+              "evidence": "app_store_link",
+              "score": 0.97
+            }
+          }
+        ],
+        "candidateLimitReached": false
+      },
+      "paidAds": {
+        "items": [
+          {
+            "id": "00000000-0000-4000-8000-000111000004",
+            "canonicalKey": "paid:meta:111000004",
+            "source": "paid",
+            "platform": "meta",
+            "archiveId": "111000004",
+            "advertiser": {
+              "externalId": "900000001",
+              "name": "Example Calories"
+            },
+            "status": "active",
+            "startedAt": "2026-11-08T00:00:00.000Z",
+            "endedAt": null,
+            "discoveredAt": "2026-11-10T00:00:00.000Z",
+            "sourceUrl": "https://www.facebook.com/ads/library?id=111000004",
+            "creative": {
+              "format": "video",
+              "hook": "Scan your plate, get calories in seconds",
+              "body": "Scan your plate, get calories in seconds",
+              "title": "Example Calories",
+              "description": null,
+              "ctaText": "Get offer",
+              "imageUrls": [],
+              "videoUrls": [],
+              "units": []
+            },
+            "productLink": {
+              "kind": "official_domain",
+              "name": "Example Calories",
+              "url": "https://try.example-calories.com/quiz",
+              "externalId": null,
+              "confidence": "unresolved"
+            },
+            "destination": {
+              "kind": "web",
+              "url": "https://try.example-calories.com/quiz",
+              "host": "try.example-calories.com",
+              "page": "try.example-calories.com",
+              "appStoreId": null
+            },
+            "productIconUrl": null,
+            "performance": {
+              "kind": "unavailable"
+            },
+            "saved": false
+          },
+          {
+            "id": "00000000-0000-4000-8000-000111000003",
+            "canonicalKey": "paid:meta:111000003",
+            "source": "paid",
+            "platform": "meta",
+            "archiveId": "111000003",
+            "advertiser": {
+              "externalId": "900000001",
+              "name": "Example Calories"
+            },
+            "status": "active",
+            "startedAt": "2026-09-20T00:00:00.000Z",
+            "endedAt": null,
+            "discoveredAt": "2026-09-22T00:00:00.000Z",
+            "sourceUrl": "https://www.facebook.com/ads/library?id=111000003",
+            "creative": {
+              "format": "image",
+              "hook": "Hit your protein goal without guessing",
+              "body": "Hit your protein goal without guessing",
+              "title": "Example Calories",
+              "description": null,
+              "ctaText": "Install now",
+              "imageUrls": [],
+              "videoUrls": [],
+              "units": []
+            },
+            "productLink": {
+              "kind": "app_store",
+              "name": "Example Calories",
+              "url": "https://apps.apple.com/app/id1000000001",
+              "externalId": "1000000001",
+              "confidence": "verified"
+            },
+            "destination": {
+              "kind": "app_store",
+              "url": "https://apps.apple.com/app/id1000000001",
+              "host": "apps.apple.com",
+              "page": "apps.apple.com",
+              "appStoreId": "1000000001"
+            },
+            "productIconUrl": null,
+            "performance": {
+              "kind": "unavailable"
+            },
+            "saved": false
+          }
+        ],
+        "nextCursor": "ex-cursor-1",
+        "hasMore": true
+      },
+      "paidAdDestinations": {
+        "appStore": 14,
+        "playStore": 2,
+        "web": 6,
+        "unknown": 1,
+        "landingPages": [
+          {
+            "page": "apps.apple.com/app/id1000000001",
+            "url": "https://apps.apple.com/app/id1000000001",
+            "kind": "app_store",
+            "adCount": 14,
+            "activeCount": 3,
+            "firstSeenAt": "2026-03-02T00:00:00.000Z",
+            "lastSeenAt": "2026-11-10T00:00:00.000Z"
+          },
+          {
+            "page": "try.example-calories.com/quiz",
+            "url": "https://try.example-calories.com/quiz",
+            "kind": "web",
+            "adCount": 6,
+            "activeCount": 2,
+            "firstSeenAt": "2026-10-01T00:00:00.000Z",
+            "lastSeenAt": "2026-11-10T00:00:00.000Z"
+          }
+        ]
+      }
+    },
+    "pages": [
+      {
+        "items": [
+          {
+            "id": "00000000-0000-4000-8000-000111000001",
+            "canonicalKey": "paid:tiktok:111000001",
+            "source": "paid",
+            "platform": "tiktok",
+            "archiveId": "111000001",
+            "advertiser": {
+              "externalId": "900000001",
+              "name": "Example Calories"
+            },
+            "status": "active",
+            "startedAt": "2026-05-06T00:00:00.000Z",
+            "endedAt": null,
+            "discoveredAt": "2026-05-08T00:00:00.000Z",
+            "sourceUrl": "https://library.tiktok.com/ads/detail/?ad_id=111000001",
+            "creative": {
+              "format": "video",
+              "hook": "Your calorie counter, minus the typing",
+              "body": "Your calorie counter, minus the typing",
+              "title": "Example Calories",
+              "description": null,
+              "ctaText": "Download",
+              "imageUrls": [],
+              "videoUrls": [],
+              "units": []
+            },
+            "productLink": {
+              "kind": "app_store",
+              "name": "Example Calories",
+              "url": "https://apps.apple.com/app/id1000000001",
+              "externalId": "1000000001",
+              "confidence": "verified"
+            },
+            "destination": {
+              "kind": "app_store",
+              "url": "https://apps.apple.com/app/id1000000001",
+              "host": "apps.apple.com",
+              "page": "apps.apple.com",
+              "appStoreId": "1000000001"
+            },
+            "productIconUrl": null,
+            "performance": {
+              "kind": "unavailable"
+            },
+            "saved": false
+          }
+        ],
+        "nextCursor": null,
+        "hasMore": false
+      }
+    ]
+  },
+  {
+    "storeId": "1000000002",
+    "label": "Sample Snap Calories",
+    "fetchedAt": "2026-11-12T08:00:00.000Z",
+    "media": {
+      "organic": {
+        "data": [],
+        "candidateLimitReached": false
+      },
+      "paidAds": {
+        "items": [],
+        "nextCursor": null,
+        "hasMore": false
+      },
+      "paidAdDestinations": {
+        "appStore": 0,
+        "playStore": 0,
+        "web": 0,
+        "unknown": 0,
+        "landingPages": []
+      }
+    },
+    "pages": []
+  }
+]

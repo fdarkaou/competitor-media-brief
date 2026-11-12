@@ -1,0 +1,14 @@
+{
+  "name": "competitor-media-brief",
+  "version": "1.0.0",
+  "description": "Where do rival iOS apps send their ad clicks? Reads PeekPanda's stored media view per app: paid-ad destinations (App Store, Play Store, web funnel), landing pages, live Meta and TikTok ads and organic-post matches, with a weekly diff. Markdown/CSV/JSON, optional Slack or Discord post.",
+  "type": "module",
+  "bin": { "competitor-media-brief": "cli.js" },
+  "scripts": { "test": "node --test test/" },
+  "engines": { "node": ">=18" },
+  "license": "MIT",
+  "author": "Fekri Darkaoui",
+  "repository": { "type": "git", "url": "https://github.com/fdarkaou/competitor-media-brief.git" },
+  "homepage": "https://fdarkaou.github.io/competitor-media-brief/",
+  "keywords": ["app-store", "paid-ads", "meta-ads", "tiktok-ads", "web-funnel", "competitor-analysis", "ios", "peekpanda"]
+}
